@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react';
 
 const popularMakes = [
-  'Toyota', 'Honda', 'Ford', 'Chevrolet', 'Nissan', 'Hyundai',
-  'Kia', 'Subaru', 'Tesla', 'BMW', 'Mercedes-Benz', 'Volkswagen',
-  'Jeep', 'Dodge', 'Lexus', 'Mazda', 'GMC', 'Ram', 'Audi'
+  "Acura", "Alfa Romeo", "AM General", "AMC", "Aston Martin", "Audi", "Austin", "Austin-Healey",
+  "Bentley", "BMW", "Bricklin", "Bugatti", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Citroen",
+  "Cord", "Daihatsu", "Datsun", "De Tomaso", "DeLorean", "DeSoto", "Dodge", "Eagle", "Edsel",
+  "Excalibur", "Ferrari", "FIAT", "Fisker", "Ford", "Freightliner", "Genesis", "Geo", "GMC", "Honda",
+  "Hudson", "Hummer", "Hupmobile", "Hyundai", "Ineos", "INFINITI", "Intermeccanica",
+  "International Harvester", "Isuzu", "Jaguar", "Jeep", "Karma", "Kia", "Koenigsegg", "Lada",
+  "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lincoln", "Lotus", "Lucid", "Maserati", "Maybach",
+  "Mazda", "McLaren", "Mercedes-Benz", "Mercury", "MG", "MINI", "Mitsubishi", "Morris", "Nash",
+  "Nissan", "Oldsmobile", "Opel", "Packard", "Pagani", "Pininfarina", "Plymouth", "Polestar",
+  "Pontiac", "Porsche", "RAM", "Renault", "REO", "Rivian", "Rolls-Royce", "Saab", "Saturn", "Scion",
+  "Shelby", "smart", "SSC", "Studebaker", "Subaru", "Sunbeam", "Suzuki", "Tesla", "Toyota", "Triumph",
+  "VinFast", "Volkswagen", "Volvo", "VPG", "Willys", "Yugo"
 ];
+
 
 const carDatabase = [
   { make: 'Toyota', model: 'Corolla', horsepower: 139, engineSize: '1.8L', drivetrain: 'FWD', vehicleType: 'Sedan', weight: 2900 },
