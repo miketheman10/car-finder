@@ -15,16 +15,9 @@ const popularMakes = [
   "VinFast", "Volkswagen", "Volvo", "VPG", "Willys", "Yugo"
 ];
 
-
-const carDatabase = [
-  { make: 'Toyota', model: 'Corolla', horsepower: 139, engineSize: '1.8L', drivetrain: 'FWD', vehicleType: 'Sedan', weight: 2900 },
-  { make: 'Ford', model: 'Mustang', horsepower: 450, engineSize: '5.0L', drivetrain: 'RWD', vehicleType: 'Coupe', weight: 3700 },
-  { make: 'Honda', model: 'Civic', horsepower: 158, engineSize: '2.0L', drivetrain: 'FWD', vehicleType: 'Sedan', weight: 2800 },
-  { make: 'Tesla', model: 'Model 3', horsepower: 283, engineSize: 'Electric', drivetrain: 'RWD', vehicleType: 'Sedan', weight: 3550 },
-  { make: 'Subaru', model: 'Impreza', horsepower: 152, engineSize: '2.0L', drivetrain: 'AWD', vehicleType: 'Hatchback', weight: 3100 }
-];
-
 function App() {
+  const [carDatabase, setCarDatabase] = useState([]);
+
   const [form, setForm] = useState({
     make: 'ANY',
     model: 'ANY',
@@ -42,22 +35,18 @@ function App() {
   const [isLoadingMakes, setIsLoadingMakes] = useState(false);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
-  useEffect(() => {
-    setIsLoadingMakes(true);
-    fetch('https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json')
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.Results
-          .map(m => m.Make_Name)
-          .filter(name =>
-            popularMakes.map(m => m.toLowerCase()).includes(name.toLowerCase())
-          )
-          .filter((val, idx, arr) => arr.indexOf(val) === idx)
-          .sort();
-        setMakes(filtered);
-      })
-      .finally(() => setIsLoadingMakes(false));
-  }, []);
+useEffect(() => {
+  fetch('http://localhost:3001/api/cars')
+    .then(res => res.json())
+    .then(data => {
+      console.log('Fetched car data:', data); // ✅ Debug line
+      setCarDatabase(data);
+    })
+    .catch(err => {
+      console.error('Failed to fetch cars from backend:', err);
+    });
+}, []);
+
 
   useEffect(() => {
     if (form.make !== 'ANY') {
