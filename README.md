@@ -99,6 +99,138 @@ React and Vite teams
 All open-source maintainers and UI inspiration
 
 
+Docker Setup
+
+
+1. Project Structure and Docker Context
+Your project is organized as a monorepo with separate frontend and backend directories, each containing its own Dockerfile. There’s also a root-level docker.compose.yml (should be named docker-compose.yml for standard usage) that orchestrates both services.
+
+2. Backend Dockerfile (backend/Dockerfile)
+FROM node:18
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+EXPOSE 3001
+CMD ["node", "index.js"]
+What it does:
+
+Base Image: Uses Node.js 18.
+WORKDIR: Sets working directory to /app.
+COPY package.json ./:* Copies package.json and package-lock.json for dependency installation.
+RUN npm install: Installs backend dependencies.
+COPY . .: Copies the rest of the backend code.
+EXPOSE 3001: Exposes port 3001 for the Express server.
+CMD: Starts the backend with node index.js.
+
+
+
+3. Frontend Dockerfile (frontend/Dockerfile)
+FROM node:18 AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+What it does:
+
+Multi-stage Build:
+Builder Stage: Uses Node.js 18 to install dependencies and build the React app (npm run build), outputting static files to /app/dist.
+Nginx Stage: Uses a lightweight Nginx image to serve the static files.
+COPY --from=builder: Copies the built static files into the Nginx web root.
+COPY nginx config: Uses a custom Nginx config (frontend/nginx/default.conf) to serve the SPA.
+EXPOSE 80: Exposes port 80 for HTTP traffic.
+CMD: Runs Nginx in the foreground.
+
+
+
+4. Nginx Config (frontend/nginx/default.conf)
+server {
+  listen 80;
+  server_name localhost;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri /index.html;
+  }
+}
+What it does:
+
+Serves static files from /usr/share/nginx/html.
+Uses try_files $uri [index.html](http://_vscodecontentref_/6); to support client-side routing (SPA fallback).
+
+
+
+
+5. Docker Compose (docker.compose.yml)
+version: "3.9"
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+What it does:
+
+frontend:
+Builds from frontend using its Dockerfile.
+Maps container port 80 (Nginx) to host port 3000.
+Depends on the backend service.
+backend:
+Builds from backend using its Dockerfile.
+Maps container port 3001 to host port 3001.
+
+
+
+6. How It All Works Together
+Build and Start:
+
+Run docker compose up (or docker-compose up if you rename the file).
+Docker Compose builds both images and starts both containers.
+Backend:
+
+Runs on port 3001 inside the container, exposed to the host on port 3001.
+Serves API endpoints (e.g., /api/cars).
+Frontend:
+
+React app is built into static files and served by Nginx on port 80 inside the container, mapped to port 3000 on the host.
+Nginx serves the SPA and handles client-side routing.
+Networking:
+
+Both containers are on the same Docker network, so the frontend can reach the backend using the service name backend (e.g., http://backend:3001 from inside the frontend container).
+Note: Your frontend code currently fetches from http://localhost:3001, which works in local dev but should be changed to http://backend:3001 for Dockerized deployments.
+
+
+7. Summary Table
+Service	Dockerfile	Exposed Port	Host Port	Purpose
+frontend	frontend/Dockerfile	80	3000	Serves React SPA via Nginx
+backend	backend/Dockerfile	3001	3001	Serves Express API
+
+
+
+
+8. Recommendations
+Rename docker.compose.yml to docker-compose.yml for standard compatibility.
+Update API URLs in your frontend to use http://backend:3001 when running in Docker.
+Environment Variables: Consider using environment variables for API endpoints for flexibility.
 
 
 
