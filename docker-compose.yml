@@ -1,13 +1,16 @@
-version: "3.9"
+version: '3.9'
+
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     ports:
-      - "3000:80"
+      - "80:80"  # 👈 Frontend will be accessible via http://<your-ec2-public-ip>
     depends_on:
       - backend
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     ports:
-      - "3001:3001"
+      - "3001:3001"  # API exposed on port 3001
