@@ -207,8 +207,8 @@ Run docker compose up (or docker-compose up if you rename the file).
 Docker Compose builds both images and starts both containers.
 Backend:
 
-Runs on port 3001 inside the container, exposed to the host on port 3001.
-Serves API endpoints (e.g., /api/cars).
+Runs on port 3001 inside the container (for Docker) or via Cloudflare Worker.
+Serves API endpoints such as `/api/cars` for the sample dataset.
 Frontend:
 
 React app is built into static files and served by Nginx on port 80 inside the container, mapped to port 3000 on the host.
@@ -263,7 +263,7 @@ If you are developing a production application, we recommend using TypeScript wi
 
 The project is configured to build the React frontend and serve it alongside the
 API through a single Cloudflare Worker. When you run `wrangler dev` or
-`wrangler publish`, the build step compiles the React app and wrangler uploads
+`wrangler deploy`, the build step compiles the React app and wrangler uploads
 the `frontend/dist` folder as static assets. Inside `backend/index.js`, the
 worker checks if the request URL starts with `/api`. For all other requests, it
 falls back to `env.ASSETS.fetch(request)` so the built frontend files are
@@ -273,14 +273,15 @@ returned.
 
 ```toml
 [build]
-command = "npm run build --prefix frontend"
+command = "npm install --prefix frontend && npm run build --prefix frontend"
 
-[site]
-bucket = "./frontend/dist"
+[build.upload]
+dir = "./frontend/dist"
+format = "modules"
 ```
 
 This ensures the site assets are bundled and available to the worker. Deploying
-with `wrangler publish` uploads both the worker code and the compiled
+with `wrangler deploy` uploads both the worker code and the compiled
 frontend in one step.
 
 To run the Worker locally:

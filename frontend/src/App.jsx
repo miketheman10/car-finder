@@ -36,7 +36,7 @@ function App() {
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
 useEffect(() => {
-  fetch('http://localhost:3001/api/cars')
+  fetch('/api/cars')
     .then(res => res.json())
     .then(data => {
       console.log('Fetched car data:', data); // ✅ Debug line
