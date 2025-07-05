@@ -20,6 +20,13 @@ export default {
       });
     }
 
+    // If the request isn't for the API, try to serve a static asset from the
+    // built frontend using the automatically generated ASSETS binding.
+    const assetResponse = await env.ASSETS.fetch(request);
+    if (assetResponse.status !== 404) {
+      return assetResponse;
+    }
+
     return new Response("Not found", { status: 404 });
   },
 };

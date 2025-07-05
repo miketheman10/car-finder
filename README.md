@@ -258,3 +258,36 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Cloudflare Worker Setup
+
+The project is configured to build the React frontend and serve it alongside the
+API through a single Cloudflare Worker. When you run `wrangler dev` or
+`wrangler publish`, the build step compiles the React app and wrangler uploads
+the `frontend/dist` folder as static assets. Inside `backend/index.js`, the
+worker checks if the request URL starts with `/api`. For all other requests, it
+falls back to `env.ASSETS.fetch(request)` so the built frontend files are
+returned.
+
+`wrangler.toml` contains two important sections:
+
+```toml
+[build]
+command = "npm run build --prefix frontend"
+
+[site]
+bucket = "./frontend/dist"
+```
+
+This ensures the site assets are bundled and available to the worker. Deploying
+with `wrangler publish` uploads both the worker code and the compiled
+frontend in one step.
+
+To run the Worker locally:
+
+```bash
+wrangler dev
+```
+
+This will build the frontend, start the worker, and serve both the API and the
+static site at the same address.

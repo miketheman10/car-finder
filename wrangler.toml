@@ -1,3 +1,9 @@
 name = "car-finder-api"
 main = "backend/index.js"
 compatibility_date = "2025-07-01"
+
+[build]
+command = "npm run build --prefix frontend"
+
+[site]
+bucket = "./frontend/dist"
