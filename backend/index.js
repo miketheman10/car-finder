@@ -1,45 +1,25 @@
-// CommonJS style — no "type": "module" needed
-const express = require('express');
-const cors = require('cors');
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
 
-const app = express();
-const PORT = 3001;
+    if (url.pathname.startsWith("/api/search")) {
+      const make = url.searchParams.get("make");
+      const year = url.searchParams.get("year"); // optional
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+      if (!make) {
+        return new Response("Missing 'make' query param", { status: 400 });
+      }
 
-// Sample API route
-app.get('/api/cars', (req, res) => {
-  res.json([
-    {
-      make: 'Toyota',
-      model: 'Corolla',
-      horsepower: 139,
-      engineSize: '1.8L',
-      drivetrain: 'FWD',
-      vehicleType: 'Sedan',
-      weight: 2900
-    },
-    {
-      make: 'Ford',
-      model: 'Mustang',
-      horsepower: 450,
-      engineSize: '5.0L',
-      drivetrain: 'RWD',
-      vehicleType: 'Coupe',
-      weight: 3700
-    },
-    // ... more cars
-  ]);
-});
+      // Fetch vehicle models from the NHTSA API
+      const apiUrl = `https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/${make}?format=json`;
+      const result = await fetch(apiUrl);
+      const data = await result.json();
 
+      return new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.send('Server is up and running');
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running at http://localhost:${PORT}`);
-});
+    return new Response("Not found", { status: 404 });
+  },
+};
