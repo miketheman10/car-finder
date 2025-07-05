@@ -262,11 +262,26 @@ If you are developing a production application, we recommend using TypeScript wi
 ## Cloudflare Worker Setup
 
 The project is configured to build the React frontend and serve it alongside the
-API through a single Cloudflare Worker. The `wrangler.toml` file triggers the
-frontend build step and uploads the resulting `frontend/dist` directory as
-static assets. During runtime, the Worker checks if the request targets the `/api`
-endpoint. All other paths are handled by `env.ASSETS.fetch`, which serves the
-built frontend files.
+API through a single Cloudflare Worker. When you run `wrangler dev` or
+`wrangler publish`, the build step compiles the React app and wrangler uploads
+the `frontend/dist` folder as static assets. Inside `backend/index.js`, the
+worker checks if the request URL starts with `/api`. For all other requests, it
+falls back to `env.ASSETS.fetch(request)` so the built frontend files are
+returned.
+
+`wrangler.toml` contains two important sections:
+
+```toml
+[build]
+command = "npm run build --prefix frontend"
+
+[site]
+bucket = "./frontend/dist"
+```
+
+This ensures the site assets are bundled and available to the worker. Deploying
+with `wrangler publish` uploads both the worker code and the compiled
+frontend in one step.
 
 To run the Worker locally:
 
