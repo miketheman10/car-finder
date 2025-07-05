@@ -207,8 +207,8 @@ Run docker compose up (or docker-compose up if you rename the file).
 Docker Compose builds both images and starts both containers.
 Backend:
 
-Runs on port 3001 inside the container, exposed to the host on port 3001.
-Serves API endpoints (e.g., /api/cars).
+Runs on port 3001 inside the container (for Docker) or via Cloudflare Worker.
+Serves API endpoints such as `/api/cars` for the sample dataset.
 Frontend:
 
 React app is built into static files and served by Nginx on port 80 inside the container, mapped to port 3000 on the host.
@@ -273,7 +273,7 @@ returned.
 
 ```toml
 [build]
-command = "npm run build --prefix frontend"
+command = "npm install --prefix frontend && npm run build --prefix frontend"
 
 [site]
 bucket = "./frontend/dist"
