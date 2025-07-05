@@ -1,4 +1,4 @@
-name = "car-finder-api"
+name = "car-finder"
 main = "backend/index.js"
 compatibility_date = "2025-07-01"
 
