@@ -2,6 +2,32 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    if (url.pathname.startsWith("/api/cars")) {
+      const cars = [
+        {
+          make: 'Toyota',
+          model: 'Corolla',
+          horsepower: 139,
+          engineSize: '1.8L',
+          drivetrain: 'FWD',
+          vehicleType: 'Sedan',
+          weight: 2900
+        },
+        {
+          make: 'Ford',
+          model: 'Mustang',
+          horsepower: 450,
+          engineSize: '5.0L',
+          drivetrain: 'RWD',
+          vehicleType: 'Coupe',
+          weight: 3700
+        }
+      ];
+      return new Response(JSON.stringify(cars), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     if (url.pathname.startsWith("/api/search")) {
       const make = url.searchParams.get("make");
       const year = url.searchParams.get("year"); // optional
